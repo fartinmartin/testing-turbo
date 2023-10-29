@@ -1,1 +1,1 @@
-export * from "./write";
+export * from "./extendscript";

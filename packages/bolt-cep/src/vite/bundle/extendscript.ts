@@ -1,44 +1,81 @@
 import path from "path";
 import fs from "fs";
 
-import type { BoltOptions, Flags } from "..";
-import type { OutputOptions, RollupOptions } from "rollup";
-import type { RollupBabelInputPluginOptions } from "@rollup/plugin-babel";
-
+import nodeResolve from "@rollup/plugin-node-resolve";
+import babel from "@rollup/plugin-babel";
+import json from "@rollup/plugin-json";
 import { rollup, watch } from "rollup";
 
-export interface ExtendScriptConfig {
-	extenstions: string[];
-	babel: RollupBabelInputPluginOptions;
-	ponyfills: Ponyfill[];
-	jsxbin: "off" | "copy" | "replace";
-	includes: {
-		iife: boolean;
-		globalThis: string;
-	};
-}
+import type { OutputOptions, RollupOptions } from "rollup";
+import type { Flags } from "..";
+import type { BoltOptions } from "../types";
+import { jsxInclude, jsxBin, jsxPonyfill } from "./jsx";
+import { log } from "../log";
 
-interface Ponyfill {
-	find: string;
-	replace: string;
-	inject: string;
-}
+export async function handleExtendScript(options: BoltOptions, flags: Flags) {
+	const config = getConfig(options, flags);
 
-export async function handleExtendScript(
-	options: BoltOptions,
-	{ isBuild }: Flags
-) {
-	const config = getConfig(options);
-
-	if (isBuild) {
+	if (flags.isBuild) {
 		await build(config);
 	} else {
 		watchRollup(options, config);
 	}
 }
 
-function getConfig(options: BoltOptions) {
-	return {} as RollupOptions;
+function getConfig(options: BoltOptions, { isPackage }: Flags) {
+	const { extensions, babelOptions, includes, ponyfills, rollupOverrides } =
+		options.extendscript;
+	const _extensions = [".js", ".ts", ".tsx"];
+
+	const config: RollupOptions = {
+		input: path.resolve(options.extendscript.root, "index.ts"),
+		treeshake: true,
+
+		output: {
+			file: path.join(options.dev.outDir, "host", "index.js"),
+			sourcemap: isPackage ? options.zxp.sourceMap : options.build?.sourceMap,
+		},
+
+		plugins: [
+			json(),
+
+			nodeResolve({
+				extensions: extensions ?? _extensions,
+			}),
+
+			babel({
+				exclude: /node_modules/,
+				babelrc: false,
+				babelHelpers: "inline",
+				presets: ["@babel/preset-env", "@babel/preset-typescript"],
+				plugins: [
+					"@babel/plugin-syntax-dynamic-import",
+					"@babel/plugin-proposal-class-properties",
+				],
+				...babelOptions,
+				extensions: extensions ?? _extensions,
+			}),
+
+			jsxPonyfill(ponyfills),
+
+			jsxInclude({
+				iife: includes.iife ?? true,
+				globalThis: includes.globalThis ?? "thisObj",
+			}),
+
+			jsxBin(isPackage ? options.zxp.jsxBin : options.build?.jsxBin),
+		],
+		...(rollupOverrides ?? {}),
+	};
+
+	return config;
+}
+
+async function build(config: RollupOptions) {
+	// rollup isn't able to resolve `src/host/aeft.ts` eg
+	const bundle = await rollup(config);
+	await bundle.write(config.output as OutputOptions);
+	await bundle.close();
 }
 
 async function watchRollup(options: BoltOptions, config: RollupOptions) {
@@ -53,19 +90,13 @@ async function watchRollup(options: BoltOptions, config: RollupOptions) {
 	watcher.close();
 }
 
-async function build(config: RollupOptions) {
-	const bundle = await rollup(config);
-	await bundle.write(config.output as OutputOptions);
-	await bundle.close();
-}
+function triggerHMR({ panels, dev }: BoltOptions) {
+	// no built-in way to trigger Vite's HMR reload from outside the root folder
+	// workaround will read and save index.html file for each panel to triggger reload
+	log.info("ExtendScript Change");
 
-function triggerHMR({ cep }: BoltOptions) {
-	// No built-in way to trigger Vite's HMR reload from outside the root folder
-	// Workaround will read and save index.html file for each panel to triggger reload
-	console.log("ExtendScript Change");
-
-	cep.panels.map((panel) => {
-		const tmpPath = path.join(process.cwd(), "src", "js", panel.mainPath);
+	panels.map((panel) => {
+		const tmpPath = path.join(dev.root, dev.panels, panel.root, "index.html");
 		if (fs.existsSync(tmpPath)) {
 			const txt = fs.readFileSync(tmpPath, { encoding: "utf-8" });
 			fs.writeFileSync(tmpPath, txt, { encoding: "utf-8" });

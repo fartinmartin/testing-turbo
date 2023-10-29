@@ -1,0 +1,20 @@
+// https://extendscript.docsforadobe.dev/interapplication-communication/bridgetalk-class.html?highlight=bridgetalk#appname
+export type ApplicationName =
+	| "aftereffects"
+	| "aftereffectsbeta"
+	| "ame"
+	| "amebeta"
+	| "audition"
+	| "auditionbeta"
+	| "bridge"
+	| "bridgebeta"
+	// | "flash"
+	| "illustrator"
+	| "illustratorbeta"
+	| "indesign"
+	| "indesignbeta"
+	// | "indesignserver"
+	| "photoshop"
+	| "photoshopbeta"
+	| "premierepro"
+	| "premiereprobeta";

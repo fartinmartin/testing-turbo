@@ -1,4 +1,4 @@
-import { fs } from "@lib/node";
+import { fs } from "@client/node";
 
 export const readDirSafe = (dir: string) =>
-  fs.existsSync(dir) ? fs.readdirSync(dir) : [];
+	fs.existsSync(dir) ? fs.readdirSync(dir) : [];
