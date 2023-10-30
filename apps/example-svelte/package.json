@@ -20,7 +20,7 @@
 		"vite": "^4.5.0"
 	},
 	"dependencies": {
-		"bolt-cep": "^0.0.1"
+		"bolt-cep": "workspace:*"
 	},
 	"peerDependencies": {}
 }
