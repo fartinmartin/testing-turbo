@@ -7,10 +7,10 @@ import json from "@rollup/plugin-json";
 import { rollup, watch } from "rollup";
 
 import type { OutputOptions, RollupOptions } from "rollup";
-import type { Context } from "..";
-import type { BoltOptions } from "../types";
-import { jsxInclude, jsxBin, jsxPonyfill } from "./jsx";
-import { log } from "../log";
+import type { Context } from "../..";
+import type { BoltOptions } from "../../types";
+import { jsxInclude, jsxBin, jsxPonyfill } from ".";
+import { log } from "../../lib/log";
 
 export async function handleExtendScript(
 	options: BoltOptions,

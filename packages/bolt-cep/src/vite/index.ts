@@ -1,17 +1,9 @@
-import path from "path";
 import { ConfigEnv, type Plugin } from "vite";
-import { objectify, assign } from "radash";
+import { assign } from "radash";
 
-import { loadConfigFile } from "./config/load";
-import {
-	handleExtendScript,
-	handleCopyModules,
-	handleCopyFiles,
-	handleZXP,
-} from "./bundle";
 import type { BoltOptions } from "./types/bolt";
-import { createDevIndexHtmls } from "./config/resolved";
-import { warnOverriddenConfig } from "./config/warn";
+import * as Bundle from "./bundle";
+import * as Config from "./config";
 
 export * from "./types";
 
@@ -30,38 +22,13 @@ export function bolt(options: BoltOptions): Plugin {
 		config: async function (config, env) {
 			context = setContext(env);
 
-			const optionsFromConfigFile = await loadConfigFile();
+			const optionsFromConfigFile = await Config.loadConfigFile();
 			const newOptions = assign(options, optionsFromConfigFile);
 			// TODO: warnOverriddenOptions(options, newOptions);
-			options = newOptions;
-			// TODO: merge `options` (BoltOptions) with `config` (UserConfig) (where there is overlap) below is lame attempt at that
-			// TODO: this should handle `options.panels`
+			options = Config.extendOptions(newOptions);
 
-			const { dev: { root, panels } } = options; // prettier-ignore
-			const input = objectify(
-				options.panels,
-				(panel) => panel.root,
-				(panel) => path.resolve(root, panels, panel.root, "index.html")
-			);
-
-			const overrides = {
-				clearScreen: options.dev.clearScreen,
-				build: {
-					outDir: options.dev.outDir,
-					emptyOutDir: true,
-					rollupOptions: { input },
-				},
-				preview: { port: options.dev.ports.preview },
-				server: { port: options.dev.ports.server },
-				root: options.dev.root,
-				target: options.dev.target,
-				resolve: {
-					alias: { "@esTypes": path.resolve(__dirname, "src") },
-				},
-			};
-
-			const newConfig = assign(config, overrides);
-			warnOverriddenConfig(config, newConfig);
+			const newConfig = Config.extendConfig(config, options);
+			Config.warnOverriddenConfig(config, newConfig);
 
 			return newConfig;
 		},
@@ -74,7 +41,7 @@ export function bolt(options: BoltOptions): Plugin {
 		 */
 		configResolved: function (config) {
 			if (config.isProduction) return;
-			createDevIndexHtmls(config, options);
+			Config.createDevIndexHtmls(config, options);
 		},
 
 		/**
@@ -95,9 +62,9 @@ export function bolt(options: BoltOptions): Plugin {
 		 * here we make symlink to adobe's extension folder
 		 */
 		generateBundle: function () {
-			handleManifest();
-			handleDebug();
-			handleSymlink();
+			Bundle.handleManifest.call(this, options);
+			Bundle.handleDebug.call(this, options);
+			Bundle.handleSymlink.call(this, options);
 		},
 
 		/**
@@ -110,10 +77,10 @@ export function bolt(options: BoltOptions): Plugin {
 		writeBundle: {
 			sequential: true,
 			handler: async function (_options, _bunddle) {
-				await handleExtendScript(options, context);
-				await handleCopyModules(options, context);
-				await handleCopyFiles(options, context);
-				await handleZXP(options, context);
+				await Bundle.handleExtendScript(options, context);
+				await Bundle.handleCopyModules(options, context);
+				await Bundle.handleCopyFiles(options, context);
+				await Bundle.handleZXP(options, context);
 			},
 		},
 	};

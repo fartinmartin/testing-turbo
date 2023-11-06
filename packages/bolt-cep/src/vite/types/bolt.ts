@@ -12,9 +12,18 @@ export interface BoltOptions extends CEPConfig {
 			preview: number; // `UserConfig.preview.port`
 			debug: number; // NOT from UserConfig, instead used when creating CEP .debug file
 		};
+		input: {
+			root: string;
+			client: string;
+			host: string;
+		};
+		output: {
+			root: string;
+			cep: string;
+			zxp: string;
+			zip: string;
+		};
 		// below are overrides for vite's UserConfig
-		root: string;
-		outDir: string;
 		clearScreen: boolean;
 		target: string; // "chrome74",
 	};

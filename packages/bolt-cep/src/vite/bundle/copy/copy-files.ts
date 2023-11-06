@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs-extra";
 
-import type { Context } from "..";
-import type { BoltOptions } from "../types";
-import { log } from "../log";
+import type { Context } from "../..";
+import type { BoltOptions } from "../../types";
+import { log } from "../../lib";
 
 export async function handleCopyFiles(options: BoltOptions, context: Context) {
 	if (!options.bundle?.copyAssets) return;

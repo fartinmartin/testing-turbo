@@ -3,10 +3,10 @@ import fs from "fs";
 import { normalizePath, ResolvedConfig } from "vite";
 import { listify } from "radash";
 
-import { log } from "../log";
+import { log } from "../lib/log";
 import { devHtmlTemplate } from "../templates";
 import type { BoltOptions } from "../types";
-import { injectRequire } from "../lib/require-js";
+import { injectRequire } from "../lib/external";
 
 export function createDevIndexHtmls(
 	config: ResolvedConfig,

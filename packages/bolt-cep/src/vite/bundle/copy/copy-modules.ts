@@ -2,9 +2,9 @@ import path from "path";
 import fs from "fs-extra";
 import { unique } from "radash";
 
-import type { Context } from "..";
-import type { BoltOptions } from "../types";
-import { log } from "../log";
+import type { Context } from "../..";
+import type { BoltOptions } from "../../types";
+import { log } from "../../lib/log";
 
 export async function handleCopyModules(
 	options: BoltOptions,

@@ -50,6 +50,7 @@ export interface CEPPanel {
 	displayName?: string | null;
 
 	root: string;
+	mainPath: string;
 	scriptPath?: string;
 
 	id?: string;
@@ -71,10 +72,10 @@ export interface CEPExtendedPanel extends CEPPanel {
 }
 
 interface IconConfig {
-	darkNormal?: string;
 	normal?: string;
-	darkNormalRollOver?: string;
-	normalRollOver?: string;
+	rollOver?: string;
+	dark?: string;
+	darkRollOver?: string;
 }
 
 interface WindowConfig {

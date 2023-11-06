@@ -1,47 +1,45 @@
-import type { CEP_Config_Extended } from "../cep-config";
+import type { BoltOptions } from "@vite/types";
 import { extensionTemplate } from "./extension-template";
-export const manifestTemplate = (props: CEP_Config_Extended) => {
-  const {
-    extensionManifestVersion,
-    id,
-    displayName,
-    version,
-    hosts,
-    requiredRuntimeVersion,
-    standalone,
-    panels,
-  } = props;
-  return `<?xml version="1.0" encoding="UTF-8" standalone="${
-    standalone ? "yes" : "no"
-  }"?>
-<ExtensionManifest
-    Version="${extensionManifestVersion.toFixed(1)}" 
-    ExtensionBundleId="${id}"
-    ExtensionBundleVersion="${version}"
-    ExtensionBundleName="${displayName}" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  >
-  <ExtensionList>
-    ${panels
-      .map((panel) => `<Extension Id="${panel.id}" Version="${version}" />`)
-      .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
-      .join("")}
-	</ExtensionList>
-	<ExecutionEnvironment>
-    <HostList>
-    ${hosts
-      .map((host) => `<Host Name="${host.name}" Version="${host.version}" />`)
-      .join("")}
-		</HostList>
-		<LocaleList>
-			<Locale Code="All" />
-		</LocaleList>
-		<RequiredRuntimeList>
-			<RequiredRuntime Name="CSXS" Version="${requiredRuntimeVersion.toFixed(1)}" />
-		</RequiredRuntimeList>
-	</ExecutionEnvironment>
-	<DispatchInfoList>${panels
-    .map((panel) => extensionTemplate(panel))
-    .join("")}</DispatchInfoList>
-	</ExtensionManifest>`;
+import * as xml from "xmlbuilder2";
+
+export const manifestTemplate = (options: BoltOptions) => {
+	const { extension, panels, hosts } = options;
+	const standalone = extension.standalone ? "yes" : "no";
+
+	const root = xml
+		.create({ version: "1.0", encoding: "UTF-8", standalone })
+		.ele("ExtensionManifest");
+
+	root.att("Version", extension.extensionManifestVersion.toFixed(1));
+	root.att("ExtensionBundleId", extension.id);
+	root.att("ExtensionBundleVersion", extension.version);
+	root.att("ExtensionBundleName", extension.displayName);
+	root.att("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+
+	const list = root.ele("ExtensionList");
+	panels
+		.filter((value, index, self) => self.indexOf(value) === index) // remove duplicates (TODO: should be handled when we "fill" panel array)
+		.forEach((panel) => {
+			const ext = list.ele("Extension");
+			ext.att("Id", panel.id ?? extension.id);
+			ext.att("Version", extension.version);
+		});
+
+	env: {
+		const env = root.ele("ExecutionEnvironment");
+
+		const hostList = env.ele("HostList");
+		hosts.forEach((host) => hostList.ele("Host", { Name: host.name, Version: host.version })); // prettier-ignore
+
+		const localeList = env.ele("LocaleList");
+		localeList.ele("Locale", { Code: "All" });
+
+		const runtimeList = env.ele("RequiredRuntimeList");
+		runtimeList.ele("RequiredRuntime", { Name: "CSXS", Version: extension.requiredRuntimeVersion.toFixed(1) }); // prettier-ignore
+	}
+
+	const infoList = root.ele("DispatchInfoList");
+	panels.forEach((panel) => extensionTemplate(infoList, panel));
+
+	return root.end({ prettyPrint: true });
 };

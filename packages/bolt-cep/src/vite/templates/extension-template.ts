@@ -1,81 +1,69 @@
-import type { CEP_Extended_Panel } from "../cep-config";
+import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
+import type { CEPPanel } from "..";
 
-export const extensionTemplate = ({
-  id,
-  name,
-  parameters,
-  autoVisible,
-  mainPath,
-  type,
-  host,
-  panelDisplayName,
-  width,
-  height,
-  minWidth,
-  minHeight,
-  maxWidth,
-  maxHeight,
-  iconNormal,
-  iconDarkNormal,
-  iconNormalRollOver,
-  iconDarkNormalRollOver,
-  scriptPath,
-  startOnEvents,
-}: CEP_Extended_Panel) => `<Extension Id="${id}">
-<DispatchInfo${host ? ` Host="${host}"` : ""}>
-  <Resources>
-    <MainPath>${mainPath}</MainPath>${
-  (scriptPath && `<ScriptPath>${scriptPath}</ScriptPath>`) || ""
-}<CEFCommandLine>${
-  (parameters &&
-    parameters
-      .map((item) => `\n<Parameter>${item.toString()}</Parameter>`)
-      .join("")) ||
-  ""
-}
-    </CEFCommandLine>
-  </Resources>
-  <Lifecycle>
-    <AutoVisible>${autoVisible}</AutoVisible>${
-  (startOnEvents &&
-    `<StartOn>${startOnEvents
-      .map((event) => `\n<Event>${event}</Event>`)
-      .join("")}</StartOn>`) ||
-  ""
-} 
-  </Lifecycle>
-  <UI>
-    <Type>${type}</Type>
-    ${panelDisplayName ? `<Menu>${panelDisplayName}</Menu>` : ""}
-    <Geometry>${
-      width && height
-        ? `<Size>
-        <Width>${width}</Width>
-        <Height>${height}</Height>
-      </Size>`
-        : ""
-    }${
-  maxWidth && maxHeight
-    ? `<MaxSize>
-        <Width>${maxWidth}</Width>
-        <Height>${maxHeight}</Height>
-      </MaxSize>`
-    : ""
-}${
-  minWidth && minHeight
-    ? `<MinSize>
-        <Width>${minWidth}</Width>
-        <Height>${minHeight}</Height>
-      </MinSize>`
-    : ""
-}</Geometry>
-    <Icons>
-      <Icon Type="Normal">${iconNormal}</Icon>
-      <Icon Type="DarkNormal">${iconDarkNormal}</Icon>
-      <Icon Type="RollOver">${iconNormalRollOver}</Icon>
-      <Icon Type="DarkRollOver">${iconDarkNormalRollOver}</Icon>
-    </Icons>
-  </UI>
-</DispatchInfo>
-</Extension>
-`;
+export const extensionTemplate = (root: XMLBuilder, panel: CEPPanel) => {
+	const ext = root.ele("Extension", { Id: panel.id });
+
+	const dispatch = ext.ele("DispatchInfo");
+	if (panel.host) dispatch.att("Host", panel.host);
+
+	resources: {
+		const resources = dispatch.ele("Resources");
+
+		resources.ele("MainPath").txt(panel.mainPath);
+		if (panel.scriptPath) resources.ele("ScriptPath").txt(panel.scriptPath);
+
+		const cli = resources.ele("CEFCommandLine");
+		if (panel.parameters) panel.parameters.forEach((param) => cli.ele("Parameter").txt(param)); // prettier-ignore
+	}
+
+	lifecycle: {
+		const lifecycle = dispatch.ele("Lifecycle");
+		lifecycle.ele("AutoVisible").txt(panel.window.autoVisible.toString());
+
+		if (panel.startOnEvents) {
+			const startOn = lifecycle.ele("StartOn");
+			panel.startOnEvents.forEach((event) => startOn.ele("Event").txt(event));
+		}
+	}
+
+	ui: {
+		const ui = dispatch.ele("UI"); // @ts-expect-error
+
+		ui.ele("Type").txt(panel.type);
+		if (panel.displayName) ui.ele("Menu").txt(panel.displayName);
+
+		geometry: {
+			const geometry = ui.ele("Geometry");
+
+			if (panel.window.width && panel.window.height) {
+				const size = geometry.ele("Size");
+				size.ele("Width").txt("" + panel.window.width);
+				size.ele("Height").txt("" + panel.window.height);
+			}
+
+			if (panel.window.maxWidth && panel.window.maxHeight) {
+				const maxSize = geometry.ele("MaxSize");
+				maxSize.ele("Width").txt("" + panel.window.maxWidth);
+				maxSize.ele("Height").txt("" + panel.window.maxHeight);
+			}
+
+			if (panel.window.minWidth && panel.window.minHeight) {
+				const minSize = geometry.ele("MinSize");
+				minSize.ele("Width").txt("" + panel.window.minWidth);
+				minSize.ele("Height").txt("" + panel.window.minHeight);
+			}
+		}
+
+		// prettier-ignore
+		icons: {
+      const icons = ui.ele("Icons");  // @ts-expect-error
+      icons.ele("Icon", { Type: "Normal" }).txt(panel.icons?.normal); // @ts-expect-error
+      icons.ele("Icon", { Type: "RollOver" }).txt(panel.icons?.rollOver); // @ts-expect-error
+      icons.ele("Icon", { Type: "Dark" }).txt(panel.icons?.dark); // @ts-expect-error
+      icons.ele("Icon", { Type: "DarkRollOver" }).txt(panel.icons?.darkRollOver);
+    }
+	}
+
+	return ext;
+};

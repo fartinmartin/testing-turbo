@@ -1,15 +1,25 @@
 import type { BoltOptions } from "../types";
+import * as xml from "xmlbuilder2";
 
-export const debugTemplate = (props: BoltOptions) => {
-	const { hosts, dev, panels } = props;
+export const debugTemplate = (options: BoltOptions) => {
+	const { hosts, dev, panels } = options;
 	let port = dev.ports.debug;
 
-	return `<?xml version="1.0" encoding="UTF-8"?>\n\t<ExtensionList>\n\t${panels
-		.map(
-			(panel) =>
-				`<Extension Id="${panel.id}">\n\t<HostList>\n\t${hosts
-					.map((host) => `<Host Name="${host.name}" Port="${port++}"/>`)
-					.join("")}\n\t</HostList>\n\t</Extension>`
-		)
-		.join("")}\n</ExtensionList>`;
+	const root = xml
+		.create({ version: "1.0", encoding: "UTF-8" })
+		.ele("ExtensionList");
+
+	panels.forEach((panel) => {
+		const extension = root.ele("Extension");
+		extension.att("Id", panel.id ?? options.extension.id);
+
+		extension.ele("HostList");
+		hosts.forEach(({ name }) => {
+			const host = extension.ele("Host");
+			host.att("Name", name);
+			host.att("Port", "" + port++);
+		});
+	});
+
+	return root.end({ prettyPrint: true });
 };
