@@ -1,6 +1,6 @@
-export * from "../../utils/examples";
+export * from "../utils/examples";
 
 export const helloWorld = () => {
-  alert("Hello from Photoshop");
-  app.activeDocument;
+	alert("Hello from Photoshop");
+	app.activeDocument;
 };

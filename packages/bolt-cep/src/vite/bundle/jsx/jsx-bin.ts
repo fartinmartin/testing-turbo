@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as fs from "fs-extra";
-import { tmpDir } from "../../lib/tmp-dir";
+import { tmpDir } from "../../lib/utils";
 
 const jsxbin = require("jsxbin");
 

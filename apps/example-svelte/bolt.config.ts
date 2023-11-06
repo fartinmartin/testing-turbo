@@ -68,9 +68,9 @@ const config: BoltOptions = {
 	},
 
 	bundle: {
-		installModules: [],
-		copy: [],
-		zip: [],
+		copyModules: [],
+		copyAssets: [],
+		zipAssets: [],
 	},
 
 	extendscript: {

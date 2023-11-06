@@ -26,9 +26,10 @@ export function createDevIndexHtmls(
 		return { relativePath, destinationPath, source, displayName: _key, url };
 	});
 
-	log.clear().info(`CEP Panels served at:\n`);
+	log.clear().info(`\nCEP Panels served at:\n`);
 	htmls.forEach((html) => {
 		fs.writeFileSync(html.destinationPath, html.source);
-		log.info(`\t> [${html.displayName}] ${html.relativePath}: ${html.url}`);
+		log.info(`   > ${html.displayName}: ${html.url.replace("index.html", "")}`);
 	});
+	log.info("");
 }

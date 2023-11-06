@@ -3,8 +3,8 @@
 		"target": "es3",
 		"ignoreDeprecations": "5.0",
 		// attempting to fix `RollupError: Could not resolve "./aeft"` error
-		"allowImportingTsExtensions": true,
-		"noEmit": true,
+		// "allowImportingTsExtensions": true,
+		// "noEmit": true,
 		// attempting to fix `RollupError: Could not resolve "./aeft"` error
 		"noLib": true,
 		"strict": true,

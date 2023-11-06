@@ -36,9 +36,9 @@ export interface CEPConfig {
 	};
 
 	bundle?: {
-		installModules?: string[];
-		copy?: string[];
-		zip?: string[];
+		copyModules?: string[];
+		copyAssets?: string[];
+		zipAssets?: string[];
 	};
 }
 
@@ -69,12 +69,14 @@ export interface CEPExtendedPanel extends CEPPanel {
 	type: CEPPanelType;
 	icons: IconConfig;
 }
+
 interface IconConfig {
 	darkNormal?: string;
 	normal?: string;
 	darkNormalRollOver?: string;
 	normalRollOver?: string;
 }
+
 interface WindowConfig {
 	width?: number;
 	height?: number;

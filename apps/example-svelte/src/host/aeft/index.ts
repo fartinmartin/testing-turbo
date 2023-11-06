@@ -1,4 +1,4 @@
-export * from "../utils/examples.ts";
+export * from "../utils/examples";
 
 export const helloWorld = () => {
 	alert("Hello from After Effects!");

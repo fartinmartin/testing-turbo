@@ -1,6 +1,6 @@
-export * from "../../utils/examples";
+export * from "../utils/examples";
 
 export const helloWorld = () => {
-  alert("Hello from Illustrator");
-  app.activeDocument.path;
+	alert("Hello from Illustrator");
+	app.activeDocument.path;
 };

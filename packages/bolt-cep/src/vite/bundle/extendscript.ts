@@ -7,25 +7,28 @@ import json from "@rollup/plugin-json";
 import { rollup, watch } from "rollup";
 
 import type { OutputOptions, RollupOptions } from "rollup";
-import type { Flags } from "..";
+import type { Context } from "..";
 import type { BoltOptions } from "../types";
 import { jsxInclude, jsxBin, jsxPonyfill } from "./jsx";
 import { log } from "../log";
 
-export async function handleExtendScript(options: BoltOptions, flags: Flags) {
-	const config = getConfig(options, flags);
+export async function handleExtendScript(
+	options: BoltOptions,
+	Context: Context
+) {
+	const config = getConfig(options, Context);
 
-	if (flags.isBuild) {
+	if (Context.isBuild) {
 		await build(config);
 	} else {
 		watchRollup(options, config);
 	}
 }
 
-function getConfig(options: BoltOptions, { isPackage }: Flags) {
+function getConfig(options: BoltOptions, { isPackage }: Context) {
 	const { extensions, babelOptions, includes, ponyfills, rollupOverrides } =
 		options.extendscript;
-	const _extensions = [".js", ".ts", ".tsx"];
+	const _extensions = [".js", ".ts", ".tsx", ...extensions];
 
 	const config: RollupOptions = {
 		input: path.resolve(options.extendscript.root, "index.ts"),
@@ -40,7 +43,7 @@ function getConfig(options: BoltOptions, { isPackage }: Flags) {
 			json(),
 
 			nodeResolve({
-				extensions: extensions ?? _extensions,
+				extensions: _extensions,
 			}),
 
 			babel({
@@ -53,7 +56,7 @@ function getConfig(options: BoltOptions, { isPackage }: Flags) {
 					"@babel/plugin-proposal-class-properties",
 				],
 				...babelOptions,
-				extensions: extensions ?? _extensions,
+				extensions: _extensions,
 			}),
 
 			jsxPonyfill(ponyfills),
