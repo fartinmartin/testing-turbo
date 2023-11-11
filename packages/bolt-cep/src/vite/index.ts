@@ -4,8 +4,13 @@ import { assign } from "radash";
 import type { BoltOptions } from "./types/bolt";
 import * as Bundle from "./bundle";
 import * as Config from "./config";
+import { log } from "./lib";
 
 export * from "./types";
+
+// flags for dev (there's probably a better way to go about this, but here we are)
+const LOG_HOOK_NAME = false;
+const LOG_ALL_LEVELS = false;
 
 export function bolt(options: BoltOptions): Plugin {
 	let context: Context;
@@ -14,17 +19,20 @@ export function bolt(options: BoltOptions): Plugin {
 		name: "bolt-cep",
 
 		/**
-		 * config(): modify vite config before it's resolved.
+		 * [vite] config(): modify vite config before it's resolved.
 		 *
 		 * here we merge `bolt.config.ts` and/or options provided to the `bolt` vite plugin
 		 * with the user's vite config while also enforcing some `bolt-cep` requirements.
 		 */
 		config: async function (config, env) {
+			if (LOG_HOOK_NAME) console.log("[01] [config]");
 			context = setContext(env);
 
 			const optionsFromConfigFile = await Config.loadConfigFile();
 			const newOptions = assign(options, optionsFromConfigFile);
-			// TODO: warnOverriddenOptions(options, newOptions);
+			if (!LOG_ALL_LEVELS && newOptions.dev.logLevels) log.setLevels(newOptions.dev.logLevels); // prettier-ignore
+
+			Config.warnOverriddenOptions(options, newOptions);
 			options = Config.extendOptions(newOptions);
 
 			const newConfig = Config.extendConfig(config, options);
@@ -34,22 +42,37 @@ export function bolt(options: BoltOptions): Plugin {
 		},
 
 		/**
-		 * configResolved(): called after the vite config is resolved.
+		 * [vite] configResolved(): called after the vite config is resolved.
 		 *
 		 * in development, we need to write an `index.html` file for each panel in
 		 * out project's `outDir` [because if we don't... (TODO)]
 		 */
 		configResolved: function (config) {
-			if (config.isProduction) return;
+			if (LOG_HOOK_NAME) console.log("[02] [configResolved]");
+			// if (config.isProduction) return; // TODO: is this accurate?? do we only perform the next line in dev??
+			// is this where we want to handle this? not at the end? (mainly asking in re: to the conosle output, maybe that can be a separate function)
 			Config.createDevIndexHtmls(config, options);
 		},
 
 		/**
-		 * transformIndexHtml(): for transforming HTML entry point files
+		 * [rollup] generateBundle(): called immediately before the files are written
+		 *
+		 * here we make symlink to adobe's extension folder
+		 */
+		generateBundle: function () {
+			if (LOG_HOOK_NAME) console.log("[03] [generateBundle]");
+			Bundle.handleManifest.call(this, options);
+			Bundle.handleDebug.call(this, options);
+			Bundle.handleSymlink.call(this, options);
+		},
+
+		/**
+		 * [vite] transformIndexHtml(): for transforming HTML entry point files
 		 *
 		 * (TODO...)
 		 */
 		transformIndexHtml: function (html, _context) {
+			if (LOG_HOOK_NAME) console.log("[04] [transformIndexHtml]");
 			// update asset paths from vite's default `assets/[asset.ext]` to out outDir path? why doesn't vite do this?
 			// - css
 			// update context with found packages imported with `require()`
@@ -57,18 +80,7 @@ export function bolt(options: BoltOptions): Plugin {
 		},
 
 		/**
-		 * generateBundle(): called immediately before the files are written
-		 *
-		 * here we make symlink to adobe's extension folder
-		 */
-		generateBundle: function () {
-			Bundle.handleManifest.call(this, options);
-			Bundle.handleDebug.call(this, options);
-			Bundle.handleSymlink.call(this, options);
-		},
-
-		/**
-		 * writeBundle(): called only once all files have been written.
+		 * [rollup] writeBundle(): called only once all files have been written.
 		 *
 		 * here we handle post-build actions/the bundle options passed by user such
 		 * as copying modules, files, zipping assets, etc. importantly, this is also
@@ -77,6 +89,7 @@ export function bolt(options: BoltOptions): Plugin {
 		writeBundle: {
 			sequential: true,
 			handler: async function (_options, _bunddle) {
+				if (LOG_HOOK_NAME) console.log("[05] [writeBundle]");
 				await Bundle.handleExtendScript(options, context);
 				await Bundle.handleCopyModules(options, context);
 				await Bundle.handleCopyFiles(options, context);

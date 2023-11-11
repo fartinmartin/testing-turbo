@@ -14,8 +14,8 @@ export function handleDebug(this: PluginContext, options: BoltOptions) {
 		fileName: path.join(".debug"),
 	} satisfies EmittedFile;
 
-	this.emitFile(debugFile);
-	log.info("debug file created");
+	const res = this.emitFile(debugFile);
+	log.info(`file created: .debug`);
 }
 
 export function handleManifest(this: PluginContext, options: BoltOptions) {
@@ -28,8 +28,8 @@ export function handleManifest(this: PluginContext, options: BoltOptions) {
 		fileName: path.join("CSXS", "manifest.xml"),
 	} satisfies EmittedFile;
 
-	this.emitFile(manifestFile);
-	log.info("manifest file created");
+	const res = this.emitFile(manifestFile);
+	log.info(`file created: manifest.xml`);
 }
 
 export function handleSymlink(this: PluginContext, options: BoltOptions) {
@@ -43,6 +43,7 @@ export function handleSymlink(this: PluginContext, options: BoltOptions) {
 			path.join(options.dev.output.root, options.dev.output.cep),
 			path.join(symlinkPath, options.extension.id)
 		);
+		log.info(`symlink: ${res}`);
 	} catch (e) {
 		console.warn(e);
 	} finally {

@@ -15,7 +15,9 @@ export function createDevIndexHtmls(
 	const panels = config.build.rollupOptions.input as Record<string, string>;
 
 	const htmls = listify(panels, (_key, value) => {
-		const relativePath = normalizePath(path.relative(config.root, value));
+		const { root, client } = options.dev.input;
+		const clientRoot = path.join(root, client);
+		const relativePath = normalizePath(path.relative(clientRoot, value));
 		const destinationPath = path.resolve(config.build.outDir, relativePath);
 
 		const displayName = options.extension.displayName;
@@ -27,9 +29,11 @@ export function createDevIndexHtmls(
 	});
 
 	log.clear().info(`\nCEP Panels served at:\n`);
+
 	htmls.forEach((html) => {
 		fs.writeFileSync(html.destinationPath, html.source);
 		log.info(`   > ${html.displayName}: ${html.url.replace("index.html", "")}`);
 	});
+
 	log.info("");
 }

@@ -14,7 +14,7 @@ export function extendConfig(config: UserConfig, options: BoltOptions) {
 	const inputs = objectify(
 		options.panels,
 		(panel) => panel.root,
-		(panel) => path.resolve(outDir, panels, panel.root, "index.html")
+		(panel) => path.resolve(inDir, panels, panel.root, "index.html")
 	);
 
 	const overrides = {

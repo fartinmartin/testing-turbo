@@ -9,9 +9,9 @@ import { metaPackage } from "./metaPackage";
 export async function handleZXP(options: BoltOptions, context: Context) {
 	if (!context.isPackage) return;
 
-	const distDir = path.join(__dirname, options.dev.outDir);
-	const zxpDir = path.join(__dirname, options.dev.outDir, "zxp");
-	const zipDir = path.join(__dirname, options.dev.outDir, "zip");
+	const distDir = path.join(__dirname, options.dev.output.root);
+	const zxpDir = path.join(distDir, options.dev.output.zxp);
+	const zipDir = path.join(distDir, options.dev.output.zip);
 
 	const zxpPath = await signZXP(options, distDir, zxpDir, tmpDir);
 
@@ -21,7 +21,7 @@ export async function handleZXP(options: BoltOptions, context: Context) {
 		options,
 		zipDir,
 		zxpPath,
-		options.dev.root,
+		options.dev.input.root,
 		options.bundle?.zipAssets
 	);
 }

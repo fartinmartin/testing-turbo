@@ -9,8 +9,8 @@ export async function handleCopyFiles(options: BoltOptions, context: Context) {
 	if (!options.bundle?.copyAssets) return;
 
 	copyFiles({
-		src: path.join(process.cwd(), options.dev.root),
-		dest: path.join(process.cwd(), options.dev.outDir),
+		src: path.join(process.cwd(), options.dev.input.root),
+		dest: path.join(process.cwd(), options.dev.output.root),
 		assets: options.bundle?.copyAssets ?? [],
 	});
 }
@@ -22,7 +22,9 @@ interface CopyFilesArgs {
 }
 
 export function copyFiles({ src, dest, assets }: CopyFilesArgs) {
-	log.info(`Copying ${assets.length} Assets`);
+	if (!assets.length) return;
+
+	log.info(`copying ${assets.length} assets`);
 
 	assets.map((asset: string) => {
 		const fullSrcPath = path.join(src, asset);

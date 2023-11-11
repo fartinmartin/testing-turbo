@@ -1,4 +1,3 @@
-import path from "path";
 import { type BoltOptions } from "bolt-cep";
 
 const config: BoltOptions = {
@@ -16,10 +15,10 @@ const config: BoltOptions = {
 	},
 
 	icons: {
-		darkNormal: "./src/assets/light-icon.png",
 		normal: "./src/assets/dark-icon.png",
-		darkNormalRollOver: "./src/assets/light-icon.png",
-		normalRollOver: "./src/assets/dark-icon.png",
+		rollOver: "./src/assets/light-icon.png",
+		dark: "./src/assets/light-icon.png",
+		darkRollOver: "./src/assets/dark-icon.png",
 	},
 
 	// TODO: how does this relate to `panel.window`?
@@ -43,6 +42,7 @@ const config: BoltOptions = {
 	panels: [
 		{
 			root: "main",
+			mainPath: "", // hmmm
 			displayName: "Main",
 			window: {
 				autoVisible: true,
@@ -87,15 +87,24 @@ const config: BoltOptions = {
 	dev: {
 		panels: "panels", // path to panel root (relative to `BoltOptions.dev.root` below, can be empty string)
 		symlink: "local",
-		logLevel: "info",
+		logLevels: ["info"],
 		ports: {
 			server: 3000, // `UserConfig.server.port`
 			preview: 5000, // `UserConfig.preview.port`
 			debug: 8860, // NOT from UserConfig, instead used when creating CEP .debug file
 		},
+		input: {
+			root: "src",
+			client: "client",
+			host: "host",
+		},
+		output: {
+			root: "dist",
+			cep: "cep",
+			zxp: "zxp",
+			zip: "zip",
+		},
 		// below are overrides for vite's UserConfig
-		root: "src/client",
-		outDir: path.resolve(__dirname, "dist", "cep"),
 		clearScreen: false,
 		target: "chrome74",
 	},

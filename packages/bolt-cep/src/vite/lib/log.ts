@@ -1,25 +1,27 @@
 export const log = createLogger();
 
 function createLogger() {
-	// TODO: let user control log level
-	const level = "info";
+	let levels = ["verbose", "info", "warn", "error"];
 	// TODO: colors...
 
 	return {
+		setLevels(logLevels: string[]) {
+			levels = logLevels;
+		},
 		verbose: function (message: any) {
-			console.log(message);
+			if (levels.includes("verbose")) console.log(message);
 			return this;
 		},
 		info: function (message: any) {
-			console.log(message);
+			if (levels.includes("info")) console.log(message);
 			return this;
 		},
 		warn: function (message: any) {
-			console.warn(message);
+			if (levels.includes("warn")) console.warn(message);
 			return this;
 		},
 		error: function (message: any) {
-			console.error(message);
+			if (levels.includes("error")) console.error(message);
 			return this;
 		},
 		clear: function () {

@@ -1,62 +1,70 @@
 import type { UserConfig } from "vite";
+import { BoltOptions } from "..";
+import { log } from "@vite/lib";
 
-const enforcedConfig = {
-	clearScreen: false,
-	build: { outDir: "", emptyOutDir: true, rollupOptions: { input: {} } },
-	preview: { port: 0 },
-	server: { port: 0 },
-	root: "",
-	target: "chrome74",
-};
+export function warnOverriddenOptions(
+	options: BoltOptions,
+	newOptions: BoltOptions
+) {
+	const overridden = compare(options, newOptions);
+
+	if (overridden.length > 0) {
+		const keys = overridden.map((key) => `\n   - ${key.key}`).join("");
+		log.warn(
+			`\nThe following Bolt CEP plugin options will be overridden by \`bolt.config.ts\`: \n${keys}`
+		);
+	}
+}
 
 export function warnOverriddenConfig(
 	config: UserConfig,
 	resolvedConfig: UserConfig
 ) {
-	const overridden = findOverriddenConfig(
-		config,
-		resolvedConfig,
-		enforcedConfig,
-		"",
-		[]
-	);
+	const overridden = compare(config, resolvedConfig);
 
 	if (overridden.length > 0) {
-		const keys = overridden.map((key) => `\n  - ${key}`).join("");
-		console.error(
-			`The following Vite config options will be overridden by Bolt CEP: ${keys}`
+		const keys = overridden.map((key) => `\n   - ${key.key}`).join("");
+		log.warn(
+			`\nThe following Vite config options will be overridden by Bolt CEP: \n${keys}`
 		);
 	}
 }
-function findOverriddenConfig(
-	config: Record<string, any>,
-	resolvedConfig: Record<string, any>,
-	enforcedConfig: Record<string, any>,
-	path: string,
-	out: string[]
-): string[] {
-	if (config == null || resolvedConfig == null) {
-		return out;
-	}
 
-	for (const key in enforcedConfig) {
-		if (typeof config === "object" && key in config && key in resolvedConfig) {
-			const enforced = enforcedConfig[key];
+function compare(original: any, updated: any, path = "") {
+	const changes: { key: string; originalValue: any; updatedValue: any }[] = [];
 
-			if (enforced === true) {
-				if (config[key] !== resolvedConfig[key]) {
-					out.push(path + key);
-				}
-			} else {
-				findOverriddenConfig(
-					config[key],
-					resolvedConfig[key],
-					enforced,
-					path + key + ".",
-					out
-				);
-			}
+	for (const key in original) {
+		const originalValue = original[key];
+		const updatedValue = updated[key];
+
+		if (typeof originalValue === "object" && typeof updatedValue === "object") {
+			// Recursively compare nested objects
+			const nestedChanges = compare(
+				originalValue,
+				updatedValue,
+				`${path ? path + "." : ""}${key}`
+			);
+			changes.push(...nestedChanges);
+		} else if (originalValue !== updatedValue) {
+			// Values are different, add to changes array
+			changes.push({
+				key: `${path ? path + "." : ""}${key}`,
+				originalValue,
+				updatedValue,
+			});
 		}
 	}
-	return out;
+
+	// Check for keys in the updated object that are not in the original
+	for (const key in updated) {
+		if (!(key in original)) {
+			changes.push({
+				key: `${path ? path + "." : ""}${key}`,
+				originalValue: undefined,
+				updatedValue: updated[key],
+			});
+		}
+	}
+
+	return changes;
 }

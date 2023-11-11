@@ -35,7 +35,7 @@ function getConfig(options: BoltOptions, { isPackage }: Context) {
 		treeshake: true,
 
 		output: {
-			file: path.join(options.dev.outDir, "host", "index.js"),
+			file: path.join(options.dev.output.root, "host", "index.js"),
 			sourcemap: isPackage ? options.zxp.sourceMap : options.build?.sourceMap,
 		},
 
@@ -86,7 +86,7 @@ async function watchRollup(options: BoltOptions, config: RollupOptions) {
 
 	watcher.on("event", ({ result }: any) => {
 		if (!result) return;
-		triggerHMR(options); // TODO: double check that this is necessary
+		triggerHMR(options);
 		result.close();
 	});
 
@@ -99,7 +99,13 @@ function triggerHMR({ panels, dev }: BoltOptions) {
 	log.info("ExtendScript Change");
 
 	panels.map((panel) => {
-		const tmpPath = path.join(dev.root, dev.panels, panel.root, "index.html");
+		const tmpPath = path.join(
+			dev.output.root,
+			dev.panels,
+			panel.root,
+			"index.html"
+		);
+		console.log(tmpPath);
 		if (fs.existsSync(tmpPath)) {
 			const txt = fs.readFileSync(tmpPath, { encoding: "utf-8" });
 			fs.writeFileSync(tmpPath, txt, { encoding: "utf-8" });

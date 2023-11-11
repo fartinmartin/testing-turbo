@@ -14,8 +14,8 @@ export async function handleCopyModules(
 	const allPackages = unique(userEnforcedPackages.concat(context.packages));
 	copyModules({
 		packages: allPackages,
-		src: options.dev.root,
-		dest: options.dev.outDir,
+		src: options.dev.input.root,
+		dest: options.dev.output.root,
 		symlink: false,
 	});
 }
@@ -32,18 +32,23 @@ function copyModules({ packages, src, dest, symlink }: CopyModulesArgs) {
 		return nodeSolve({ src, pkg, keepDevDependencies: false });
 	});
 
-	const uniqePackages = unique(allPackages);
+	const uniquePackages = unique(allPackages);
 
 	const numPackages = packages.length;
-	const numDependencies = uniqePackages.length;
+	const numDependencies = uniquePackages.length;
 	const packageList = packages.join(",");
+
+	if (!uniquePackages) return;
+
+	const modulesPlural = numPackages > 1 ? "s" : "";
+	const depsPlural = numDependencies > 1 ? "ies" : "y";
 	log.info(
-		`Copying ${numPackages} Node Module(s) (${numDependencies} Dependencies) : ${packageList}`
+		`copying ${numPackages} node module${modulesPlural} (${numDependencies} dependenc${depsPlural}): ${packageList}`
 	);
 
 	fs.ensureDirSync(path.join(dest, "node_modules"));
 
-	uniqePackages.map((pkg: string) => {
+	uniquePackages.map((pkg: string) => {
 		const fullSrcPath = path.join(process.cwd(), src, "node_modules", pkg);
 		const fullDstPath = path.join(process.cwd(), dest, "node_modules", pkg);
 

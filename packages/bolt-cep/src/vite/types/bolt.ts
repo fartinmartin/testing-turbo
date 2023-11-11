@@ -6,7 +6,7 @@ export interface BoltOptions extends CEPConfig {
 	dev: {
 		panels: string;
 		symlink: "local" | "global";
-		logLevel: "info";
+		logLevels: ("info" | "warn" | "error")[];
 		ports: {
 			server: number; // `UserConfig.server.port`
 			preview: number; // `UserConfig.preview.port`

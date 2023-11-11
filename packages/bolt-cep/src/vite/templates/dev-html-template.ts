@@ -6,8 +6,7 @@ export const devHtmlTemplate = ({
 	displayName: string;
 	url: string;
 	injectRequire: string;
-}) => `
-<!DOCTYPE html>
+}) => `<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
