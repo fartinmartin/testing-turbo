@@ -4,6 +4,7 @@ import { assign } from "radash";
 import type { BoltOptions } from "./types/bolt";
 import * as Bundle from "./bundle";
 import * as Config from "./config";
+import * as HTML from "./html";
 import { log } from "./lib";
 
 export * from "./types";
@@ -49,8 +50,7 @@ export function bolt(options: BoltOptions): Plugin {
 		 */
 		configResolved: function (config) {
 			if (LOG_HOOK_NAME) console.log("[02] [configResolved]");
-			// if (config.isProduction) return; // TODO: is this accurate?? do we only perform the next line in dev??
-			// is this where we want to handle this? not at the end? (mainly asking in re: to the conosle output, maybe that can be a separate function)
+			if (config.isProduction) return;
 			const panels = Config.createDevIndexHtmls(config, options);
 			context.panelPaths = panels;
 		},
@@ -62,39 +62,48 @@ export function bolt(options: BoltOptions): Plugin {
 		 */
 		configureServer: function (server) {
 			if (LOG_HOOK_NAME) console.log("[03] [dev-only] [configureServer]");
-			Config.logHtml(server, context);
+			if (context.panelPaths) Config.logPanelPaths(server, context); // since `configureServer` is a dev hook, context will have `panelPaths` from `configResolved`, this if check is just for readability
 		},
 
 		/**
-		 * [rollup] generateBundle(): called immediately before the files are written
+		 * [rollup] generateBundle(): called immediately before the files are
+		 * written
 		 *
 		 * here we create `.debug` and `manifest.xml` files and make symlink to
-		 * adobe's extension folder
+		 * adobe's extension folder. we also use this hook to parse all `require`s
+		 * in order to copy these modules to `cep/node_modules`.
+		 *
+		 * finally, we also want to fix asset paths in all of the css and js assets
+		 * in our bundle (see `transformIndexHtml` for more complete explanation and
+		 * second half of this story, aka `index.html` transform)
 		 */
-		generateBundle: function () {
+		generateBundle: function (_options, bundle) {
 			if (LOG_HOOK_NAME) console.log("[03] [generateBundle]");
-			Bundle.handleManifest.call(this, options);
-			Bundle.handleDebug.call(this, options);
-			Bundle.handleSymlink.call(this, options);
+			Bundle.createManifest.call(this, options);
+			Bundle.createDebug.call(this, options);
+			Bundle.createSymlink.call(this, options);
+
+			context.packages = Bundle.getRequires(bundle);
+			// Bundle.fixJS();
+
+			// Bundle.fixAssetPathsJS();
+			// Bundle.fixAssetPathsCSS();
 		},
 
 		/**
 		 * [vite] transformIndexHtml(): for transforming HTML entry point files
 		 *
-		 * since our `dist` is dynamic (based on user options) the assets linked in
-		 * the `index.html` files will be incorrect. here is were we correct them
-		 * based on the defined `dist` structure (not sure why vite doesn't do this for us...)
+		 * vite bundles relative to the `UserConfig.outDir`, but we are combining
+		 * our outDir with other (`host`) outputs in our `cep` folder. this means
+		 * our file paths will be out of sync.
 		 */
 		transformIndexHtml: function (html, _context) {
 			if (LOG_HOOK_NAME) console.log("[04] [transformIndexHtml]");
-			// inject require
-
-			// update asset paths
-			// - css
-			// - js
-			// - favicon? (not relevant, should we remove?)
-
-			// update context with found packages imported with `require()`
+			// TODO: injectRequire
+			// TODO: remove favicon?
+			// TODO: return early if dev?
+			// THEN: fix asset paths, remove type="module"/rel="module" attributes
+			HTML.transformHtml(html, _context, options);
 			return html;
 		},
 

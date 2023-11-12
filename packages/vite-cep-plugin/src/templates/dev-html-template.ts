@@ -1,11 +1,11 @@
 export const devHtmlTemplate = ({
 	displayName,
 	relativePath,
-	injectRequire,
+	require,
 }: {
 	displayName: string;
 	relativePath: string;
-	injectRequire: string;
+	require: string;
 }) => `<!DOCTYPE html>
 <html>
   <head>
@@ -13,7 +13,7 @@ export const devHtmlTemplate = ({
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>${displayName}</title>
-    <script>${injectRequire}</script>
+    <script>${require}</script>
   </head>
 
   <body>

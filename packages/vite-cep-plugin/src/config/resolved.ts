@@ -6,7 +6,7 @@ import { listify } from "radash";
 import { log } from "../lib/log";
 import { devHtmlTemplate } from "../templates";
 import type { BoltOptions } from "../types";
-import { injectRequire } from "../lib/external";
+import { require } from "../lib/external";
 import { Context } from "..";
 
 export type PanelPaths = ReturnType<typeof createDevIndexHtmls>;
@@ -24,13 +24,13 @@ export function createDevIndexHtmls(
 		const destinationPath = path.resolve(config.build.outDir, relativePath);
 		const displayName = options.extension.displayName;
 
-		const source = devHtmlTemplate({ displayName, relativePath, injectRequire }); // prettier-ignore
+		const source = devHtmlTemplate({ displayName, relativePath, require }); // prettier-ignore
 
 		return { relativePath, destinationPath, source, displayName: _key };
 	});
 }
 
-export function logHtml(server: ViteDevServer, { panelPaths }: Context) {
+export function logPanelPaths(server: ViteDevServer, { panelPaths }: Context) {
 	server?.httpServer?.once("listening", () => _log(server.config.server.port));
 
 	function _log(port: number | undefined) {

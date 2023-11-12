@@ -4,7 +4,7 @@ import type { BoltOptions } from "../../types";
 import * as Templates from "../../templates";
 import { log, ccExtensionDir, makeSymlink } from "../../lib";
 
-export function handleDebug(this: PluginContext, options: BoltOptions) {
+export function createDebug(this: PluginContext, options: BoltOptions) {
 	const xml = Templates.debugTemplate(options);
 
 	const debugFile = {
@@ -18,7 +18,7 @@ export function handleDebug(this: PluginContext, options: BoltOptions) {
 	log.info(`file created: .debug`);
 }
 
-export function handleManifest(this: PluginContext, options: BoltOptions) {
+export function createManifest(this: PluginContext, options: BoltOptions) {
 	const xml = Templates.manifestTemplate(options);
 
 	const manifestFile = {
@@ -32,7 +32,7 @@ export function handleManifest(this: PluginContext, options: BoltOptions) {
 	log.info(`file created: manifest.xml`);
 }
 
-export function handleSymlink(this: PluginContext, options: BoltOptions) {
+export function createSymlink(this: PluginContext, options: BoltOptions) {
 	const symlinkPath =
 		options.dev.symlink === "global"
 			? ccExtensionDir.global
