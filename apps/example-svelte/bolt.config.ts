@@ -1,4 +1,4 @@
-import { type BoltOptions } from "bolt-cep";
+import { type BoltOptions } from "vite-cep-plugin";
 
 const config: BoltOptions = {
 	extension: {
@@ -74,7 +74,7 @@ const config: BoltOptions = {
 	},
 
 	extendscript: {
-		root: "src/host",
+		root: "src/host", // TODO: remove from here? we're already defining at `dev.input.host`
 		babelOptions: {},
 		extensions: [],
 		ponyfills: [],

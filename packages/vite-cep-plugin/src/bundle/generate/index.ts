@@ -1,8 +1,8 @@
 import path from "path";
 import { EmittedFile, PluginContext } from "rollup";
 import type { BoltOptions } from "../../types";
-import * as Templates from "@vite/templates";
-import { log, ccExtensionDir, makeSymlink } from "@vite/lib";
+import * as Templates from "../../templates";
+import { log, ccExtensionDir, makeSymlink } from "../../lib";
 
 export function handleDebug(this: PluginContext, options: BoltOptions) {
 	const xml = Templates.debugTemplate(options);

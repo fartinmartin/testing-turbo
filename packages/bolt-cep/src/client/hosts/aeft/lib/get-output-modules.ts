@@ -1,4 +1,4 @@
-import { fs, path } from "@client/node";
+import { fs, path } from "../../../node";
 import { getLatestFile } from "./get-latest-file";
 import { getPrefsDir } from "./get-prefs-dir";
 

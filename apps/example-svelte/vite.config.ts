@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
-import { type BoltOptions, bolt } from "bolt-cep";
+import { type BoltOptions, bolt } from "vite-cep-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig({

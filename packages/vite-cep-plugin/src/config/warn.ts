@@ -1,6 +1,6 @@
 import type { UserConfig } from "vite";
 import { BoltOptions } from "..";
-import { log } from "@vite/lib";
+import { log } from "../lib";
 
 export function warnOverriddenOptions(
 	options: BoltOptions,
@@ -9,7 +9,7 @@ export function warnOverriddenOptions(
 	const overridden = compare(options, newOptions);
 
 	if (overridden.length > 0) {
-		const keys = overridden.map((key) => `\n   - ${key.key}`).join("");
+		const keys = overridden.map((key) => `\n  - ${key.key}`).join("");
 		log.warn(
 			`\nThe following Bolt CEP plugin options will be overridden by \`bolt.config.ts\`: \n${keys}`
 		);
@@ -23,7 +23,7 @@ export function warnOverriddenConfig(
 	const overridden = compare(config, resolvedConfig);
 
 	if (overridden.length > 0) {
-		const keys = overridden.map((key) => `\n   - ${key.key}`).join("");
+		const keys = overridden.map((key) => `\n  - ${key.key}`).join("");
 		log.warn(
 			`\nThe following Vite config options will be overridden by Bolt CEP: \n${keys}`
 		);

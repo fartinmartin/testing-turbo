@@ -1,4 +1,4 @@
-import type { BoltOptions } from "@vite/types";
+import type { BoltOptions } from "../types";
 import { extensionTemplate } from "./extension-template";
 import * as xml from "xmlbuilder2";
 

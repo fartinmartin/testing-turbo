@@ -1,4 +1,4 @@
-import { fs, path } from "@client/node";
+import { fs, path } from "../../../node";
 
 export const getLatestFile = (dir: string, suffix: string): string | null => {
 	const getModified = (filePath: string) =>

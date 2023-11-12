@@ -1,5 +1,5 @@
-import { path } from "@client/node";
-import { csi } from "@client/cep";
+import { path } from "../../../node";
+import { csi } from "../../../cep";
 
 export const getPrefsDir = (): string => {
 	const appVersion = csi.getHostEnvironment().appVersion;

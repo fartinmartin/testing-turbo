@@ -1,4 +1,4 @@
-import { ConfigEnv, type Plugin } from "vite";
+import type { ConfigEnv, Plugin } from "vite";
 import { assign } from "radash";
 
 import type { BoltOptions } from "./types/bolt";
@@ -51,13 +51,25 @@ export function bolt(options: BoltOptions): Plugin {
 			if (LOG_HOOK_NAME) console.log("[02] [configResolved]");
 			// if (config.isProduction) return; // TODO: is this accurate?? do we only perform the next line in dev??
 			// is this where we want to handle this? not at the end? (mainly asking in re: to the conosle output, maybe that can be a separate function)
-			Config.createDevIndexHtmls(config, options);
+			const panels = Config.createDevIndexHtmls(config, options);
+			context.panelPaths = panels;
+		},
+
+		/**
+		 * [vite] configureServer(): hook for configuring the dev server.
+		 *
+		 * used to grab instance of dev server (in order to print accurate port numbers)
+		 */
+		configureServer: function (server) {
+			if (LOG_HOOK_NAME) console.log("[03] [dev-only] [configureServer]");
+			Config.logHtml(server, context);
 		},
 
 		/**
 		 * [rollup] generateBundle(): called immediately before the files are written
 		 *
-		 * here we make symlink to adobe's extension folder
+		 * here we create `.debug` and `manifest.xml` files and make symlink to
+		 * adobe's extension folder
 		 */
 		generateBundle: function () {
 			if (LOG_HOOK_NAME) console.log("[03] [generateBundle]");
@@ -90,7 +102,7 @@ export function bolt(options: BoltOptions): Plugin {
 			sequential: true,
 			handler: async function (_options, _bunddle) {
 				if (LOG_HOOK_NAME) console.log("[05] [writeBundle]");
-				await Bundle.handleExtendScript(options, context);
+				await Bundle.handleExtendScript(options, context); // could use [vite] handleHotUpdate() hook maybe?
 				await Bundle.handleCopyModules(options, context);
 				await Bundle.handleCopyFiles(options, context);
 				await Bundle.handleZXP(options, context);
@@ -108,6 +120,7 @@ export type Context = {
 	isServe: boolean;
 	action: string | undefined;
 	packages: string[];
+	panelPaths?: any[];
 };
 
 function setContext(env: ConfigEnv): Context {

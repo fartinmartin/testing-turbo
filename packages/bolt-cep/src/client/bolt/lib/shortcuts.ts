@@ -1,4 +1,4 @@
-import { csi } from "@client/cep";
+import { csi } from "../../cep";
 
 /**
  * Register all possible keyboard shortcuts on Mac and Windows for you CEP Panel

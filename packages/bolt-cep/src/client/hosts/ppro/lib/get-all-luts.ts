@@ -1,5 +1,5 @@
-import { os, path } from "@client/node";
-import { csi } from "@client/cep";
+import { os, path } from "../../../node";
+import { csi } from "../../../cep";
 import { readDirSafe } from "./utils";
 
 export const getAllLuts = (): { creative: string[]; technical: string[] } => {

@@ -9,7 +9,7 @@ export function extendConfig(config: UserConfig, options: BoltOptions) {
 	const { dev: { input, output, panels } } = options; // prettier-ignore
 
 	const inDir = path.join(input.root, input.client);
-	const outDir = path.join(output.root, output.cep);
+	const outDir = path.join(process.cwd(), output.root, output.cep);
 
 	const inputs = objectify(
 		options.panels,

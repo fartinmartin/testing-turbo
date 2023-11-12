@@ -1,4 +1,4 @@
-// import { initBolt } from "bolt-cep";
+// import { initBolt } from "vite-cep-plugin";
 import App from "./app.svelte";
 import "./app.css";
 

@@ -1,4 +1,4 @@
-import { csi } from "@client/cep";
+import { csi } from "../../cep";
 
 export const posix = (str: string) => str.replace(/\\/g, "/");
 

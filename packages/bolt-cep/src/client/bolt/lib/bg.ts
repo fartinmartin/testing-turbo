@@ -1,4 +1,4 @@
-import { csi } from "@client/cep";
+import { csi } from "../../cep";
 
 export const getAppBackgroundColor = () => {
 	const env = window.__adobe_cep__.getHostEnvironment() as string;

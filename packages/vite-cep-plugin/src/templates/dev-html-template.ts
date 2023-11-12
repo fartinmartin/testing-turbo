@@ -1,10 +1,10 @@
 export const devHtmlTemplate = ({
 	displayName,
-	url,
+	relativePath,
 	injectRequire,
 }: {
 	displayName: string;
-	url: string;
+	relativePath: string;
 	injectRequire: string;
 }) => `<!DOCTYPE html>
 <html>
@@ -19,7 +19,7 @@ export const devHtmlTemplate = ({
   <body>
     <div id="root"></div>
     <script>
-      window.location.href = '${url}';
+      window.location.href = [window.location.origin, '${relativePath}'].join("/");
     </script>
   </body>
 </html>`;

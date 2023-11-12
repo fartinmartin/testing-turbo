@@ -1,4 +1,4 @@
-import { csi } from "@client/cep";
+import { csi } from "../../../cep";
 
 export const evalFile = (filePath: string) => {
 	const script = `typeof $ !== 'undefined' ? $.evalFile("${filePath}") : fl.runScript(FLfile.platformPathToURI("${filePath}"));`;

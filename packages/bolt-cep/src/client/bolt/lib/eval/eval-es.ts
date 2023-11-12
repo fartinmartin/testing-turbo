@@ -1,4 +1,4 @@
-import { csi } from "@client/cep";
+import { csi } from "../../../cep";
 
 export function createEvalES(namespace: string, orThrow?: boolean) {
 	const namespaced = `var host = typeof $ !== 'undefined' ? $ : window; host["${namespace}"].`;

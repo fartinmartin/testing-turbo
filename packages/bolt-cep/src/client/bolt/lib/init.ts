@@ -1,6 +1,6 @@
-import { evalFile } from "@client/bolt";
-import { csi } from "@client/cep";
-import { fs } from "@client/node";
+import { evalFile } from "../../bolt";
+import { csi } from "../../cep";
+import { fs } from "../../node";
 
 export const initBolt = (log = true) => {
 	if (window.cep) {
