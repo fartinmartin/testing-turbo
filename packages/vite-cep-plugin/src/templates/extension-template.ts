@@ -10,7 +10,7 @@ export const extensionTemplate = (root: XMLBuilder, panel: CEPPanel) => {
 	resources: {
 		const resources = dispatch.ele("Resources");
 
-		resources.ele("MainPath").txt(panel.mainPath);
+		resources.ele("MainPath").txt(panel.mainPath!);
 		if (panel.scriptPath) resources.ele("ScriptPath").txt(panel.scriptPath);
 
 		const cli = resources.ele("CEFCommandLine");
@@ -57,11 +57,11 @@ export const extensionTemplate = (root: XMLBuilder, panel: CEPPanel) => {
 
 		// prettier-ignore
 		icons: {
-      const icons = ui.ele("Icons");  // @ts-expect-error
-      icons.ele("Icon", { Type: "Normal" }).txt(panel.icons?.normal); // @ts-expect-error
-      icons.ele("Icon", { Type: "RollOver" }).txt(panel.icons?.rollOver); // @ts-expect-error
-      icons.ele("Icon", { Type: "Dark" }).txt(panel.icons?.dark); // @ts-expect-error
-      icons.ele("Icon", { Type: "DarkRollOver" }).txt(panel.icons?.darkRollOver);
+      const icons = ui.ele("Icons");
+      icons.ele("Icon", { Type: "Normal" }).txt(panel.icons?.normal!);
+      icons.ele("Icon", { Type: "RollOver" }).txt(panel.icons?.rollOver!);
+      icons.ele("Icon", { Type: "DarkNormal" }).txt(panel.icons?.dark!);
+      icons.ele("Icon", { Type: "DarkRollOver" }).txt(panel.icons?.darkRollOver!);
     }
 	}
 

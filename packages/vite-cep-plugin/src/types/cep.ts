@@ -10,7 +10,7 @@ export interface CEPConfig {
 		extensionManifestVersion: number;
 		requiredRuntimeVersion: number;
 		// TODO: what are these?
-		scriptPath?: string;
+		scriptPath?: string; // TODO: i think this is set per-panel, so we could remove from here
 		standalone?: boolean; // https://stackoverflow.com/a/17329699/8703073
 	};
 
@@ -50,7 +50,7 @@ export interface CEPPanel {
 	displayName?: string | null;
 
 	root: string;
-	mainPath: string;
+	mainPath?: string;
 	scriptPath?: string;
 
 	id?: string;

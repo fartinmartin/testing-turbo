@@ -13,9 +13,9 @@ export const debugTemplate = (options: BoltOptions) => {
 		const extension = root.ele("Extension");
 		extension.att("Id", panel.id ?? options.extension.id);
 
-		extension.ele("HostList");
+		const hostList = extension.ele("HostList");
 		hosts.forEach(({ name }) => {
-			const host = extension.ele("Host");
+			const host = hostList.ele("Host");
 			host.att("Name", name);
 			host.att("Port", "" + port++);
 		});

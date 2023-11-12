@@ -81,12 +81,19 @@ export function bolt(options: BoltOptions): Plugin {
 		/**
 		 * [vite] transformIndexHtml(): for transforming HTML entry point files
 		 *
-		 * (TODO...)
+		 * since our `dist` is dynamic (based on user options) the assets linked in
+		 * the `index.html` files will be incorrect. here is were we correct them
+		 * based on the defined `dist` structure (not sure why vite doesn't do this for us...)
 		 */
 		transformIndexHtml: function (html, _context) {
 			if (LOG_HOOK_NAME) console.log("[04] [transformIndexHtml]");
-			// update asset paths from vite's default `assets/[asset.ext]` to out outDir path? why doesn't vite do this?
+			// inject require
+
+			// update asset paths
 			// - css
+			// - js
+			// - favicon? (not relevant, should we remove?)
+
 			// update context with found packages imported with `require()`
 			return html;
 		},

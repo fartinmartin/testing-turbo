@@ -1,10 +1,11 @@
 import { type BoltOptions } from "vite-cep-plugin";
+import pkg from "./package.json";
 
 const config: BoltOptions = {
 	extension: {
-		version: "",
-		id: "com.bolt.cep",
-		displayName: "Bolt CEP",
+		version: pkg.version,
+		id: "com.vite-bolt.cep",
+		displayName: "Vite Bolt CEP",
 		type: "Panel",
 		parameters: [],
 		extensionManifestVersion: 6.0,
@@ -15,10 +16,10 @@ const config: BoltOptions = {
 	},
 
 	icons: {
-		normal: "./src/assets/dark-icon.png",
-		rollOver: "./src/assets/light-icon.png",
-		dark: "./src/assets/light-icon.png",
-		darkRollOver: "./src/assets/dark-icon.png",
+		normal: "./src/assets/light-icon.png",
+		rollOver: "./src/assets/light-icon-rollover.png",
+		dark: "./src/assets/dark-icon.png",
+		darkRollOver: "./src/assets/dark-icon-rollover.png",
 	},
 
 	// TODO: how does this relate to `panel.window`?
@@ -41,14 +42,13 @@ const config: BoltOptions = {
 
 	panels: [
 		{
-			root: "main",
-			mainPath: "", // hmmm
-			displayName: "Main",
+			root: "main", // relative to `dev.panels`
 			window: {
 				autoVisible: true,
 				width: 500,
 				height: 550,
 			},
+			parameters: ["--v=0", "--enable-nodejs", "--mixed-context"],
 		},
 	],
 

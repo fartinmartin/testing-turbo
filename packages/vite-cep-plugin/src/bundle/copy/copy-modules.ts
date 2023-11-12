@@ -15,7 +15,7 @@ export async function handleCopyModules(
 	copyModules({
 		packages: allPackages,
 		src: options.dev.input.root,
-		dest: options.dev.output.root,
+		dest: path.join(options.dev.output.root, options.dev.output.cep),
 		symlink: false,
 	});
 }

@@ -4,7 +4,7 @@ import * as xml from "xmlbuilder2";
 
 export const manifestTemplate = (options: BoltOptions) => {
 	const { extension, panels, hosts } = options;
-	const standalone = extension.standalone ? "yes" : "no";
+	const standalone = extension.standalone ? "yes" : "no"; // hmm, somethings up with `standalone`...
 
 	const root = xml
 		.create({ version: "1.0", encoding: "UTF-8", standalone })

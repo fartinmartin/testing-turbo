@@ -35,7 +35,12 @@ function getConfig(options: BoltOptions, { isPackage }: Context) {
 		treeshake: true,
 
 		output: {
-			file: path.join(options.dev.output.root, "host", "index.js"),
+			file: path.join(
+				options.dev.output.root,
+				options.dev.output.cep,
+				"host",
+				"index.js"
+			),
 			sourcemap: isPackage ? options.zxp.sourceMap : options.build?.sourceMap,
 		},
 

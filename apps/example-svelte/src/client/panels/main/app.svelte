@@ -1,7 +1,6 @@
 <script lang="ts">
 	// const { os, path } = require("bolt-cep");
 	import * as bolt from "bolt-cep";
-	console.log(bolt);
 
 	function node() {
 		const version = `Node.js ${process.version}`;
